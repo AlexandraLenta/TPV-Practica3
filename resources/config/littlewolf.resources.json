@@ -1,0 +1,32 @@
+{
+
+  "fonts" : [
+    { "id" : "MFR12", "file" : "resources/fonts/Monofonto-regular.ttf", "size": 12 },
+    { "id" : "MFR16", "file" : "resources/fonts/Monofonto-regular.ttf", "size": 16 },
+    { "id" : "MFR24", "file" : "resources/fonts/Monofonto-regular.ttf", "size": 24 },
+    { "id" : "MFR48", "file" : "resources/fonts/Monofonto-regular.ttf", "size": 48 }
+  ],
+  
+  "images" : [
+  ],
+  
+  "messages" : [
+	{ "id" : "usage_1", "text" : "  T: show/hide help text ", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_2", "text" : "LSH: move/slide slowly", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_3", "text" : "H/L: turn left/right ", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_4", "text" : "W/S: move forward/backwards", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_5", "text" : "D/A: slide left/right", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_6", "text" : "  N: Next player view", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_7", "text" : "  M: Unmute", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_8", "text" : "  M: Mute", "font" : "MFR12", "color" : "0xffffffff" }  
+  ],
+ 
+  "sounds" : [
+    { "id" : "gunshot", "file" : "resources/sound/gunshot.wav" },
+    { "id" : "pain", "file" : "resources/sound/pain.wav" }
+  ],
+
+  "musics" : [
+  ]
+
+}
