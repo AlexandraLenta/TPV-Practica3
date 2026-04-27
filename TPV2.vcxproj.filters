@@ -54,7 +54,10 @@
     <ClCompile Include="src\game\LittleWolf.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sdlutils\TCPServer.cpp">
+    <ClCompile Include="src\game\TCPServer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\game\Networking.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -131,13 +134,16 @@
     <ClInclude Include="src\game\LittleWolf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdlutils\SDLNetUtils.h">
+    <ClInclude Include="src\game\SDLNetUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdlutils\TCPServer.h">
+    <ClInclude Include="src\game\TCPServer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sdlutils\messages.h">
+    <ClInclude Include="src\game\messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\game\Networking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
