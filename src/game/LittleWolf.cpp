@@ -19,12 +19,12 @@ LittleWolf::LittleWolf() :
 	_show_help(true), //
 	_xres(), //
 	_yres(), //
-	_walling_width(), //
-	_walling_height(), //
+	_walling_width(), // width of walls
+	_walling_height(), // height of walls
 	_shoot_distace(), // the shoot distance -- note that it's wrt. to the walling size
-	_map(), //
-	_players(), //
-	_curr_player_id(0), //
+	_map(), // the map
+	_players(), // player array
+	_curr_player_id(0), // the id of the current player
 	_mute(false) { // we start with player 0
 }
 
@@ -285,6 +285,8 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	_players[id] = p;
 
 	_curr_player_id = id;
+
+	send_my_info();
 
 	return true;
 }
@@ -644,4 +646,40 @@ void LittleWolf::muteSound() {
 	float gain = _mute ? 0.0f : 1.0f;
 	SoundManager::Instance()->stop_all(0);
 	SoundManager::Instance()->set_master_volume(gain);
+}
+
+void LittleWolf::send_my_info() {
+	Player& p = _players[_curr_player_id];
+
+	Game::Instance()->get_networking().send_my_info(Vector2D(p.where.x, p.where.y),
+		p.theta, p.state);
+}
+
+void LittleWolf::update_player_state(Uint8 id, float x, float y, float rot) {
+
+	Player& p = _players[id];
+
+	p.where.x = x;
+	p.where.y = y;
+	p.id = id;
+	p.theta = rot;
+
+}
+
+void LittleWolf::killPlayer(Uint8 id) {
+	_players[id].state = PlayerState::DEAD;
+}
+
+void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Uint8 state) {
+	Player& p = _players[id];
+
+	p.where.x = x;
+	p.where.y = y;
+	p.id = id;
+	p.theta = rot;
+	p.state = static_cast<PlayerState>(state);
+}
+
+void LittleWolf::removePlayer(Uint8 id) {
+	_players[id].state = PlayerState::NOT_USED;
 }

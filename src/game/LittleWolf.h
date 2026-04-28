@@ -23,7 +23,7 @@ public:
 		float x;
 		float y;
 
-		Point(float x, float y) : x(x), y(y) {
+		Point(float x = 0, float y = 0) : x(x), y(y) {
 
 		}
 
@@ -156,6 +156,12 @@ private:
 
 	// mute/unmute sound
 	void muteSound();
+
+	void send_my_info();
+	void killPlayer(Uint8 id);
+	void update_player_state(Uint8 id, float x, float y, float rot);
+	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
+	void removePlayer(Uint8 id);
 
 	// Calculates wall size using the <corrected> ray to the wall.
 	Wall project(const int xres, const int yres, const float focal,

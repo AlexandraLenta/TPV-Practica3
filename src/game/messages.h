@@ -50,12 +50,10 @@ struct PlayerInfoMsg : MsgWithClientId {
 
 	float x;
 	float y;
-	int w;
-	int h;
 	float rot;
 	Uint8 state;
 
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, w, h, rot, state)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, state)
 
 };
 

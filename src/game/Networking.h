@@ -24,7 +24,7 @@ public:
 	}
 
 	void send_state(const Vector2D& pos, float rot);
-	void send_my_info(const Vector2D& pos, float w, float h, float rot,
+	void send_my_info(const Vector2D& pos, float rot,
 		Uint8 state);
 
 	void send_shoot(Vector2D p, Vector2D v, int width, int height, float r);
