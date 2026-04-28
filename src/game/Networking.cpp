@@ -155,6 +155,9 @@ void Networking::update() {
 			handle_restart();
 			break;
 
+		case _RESTART_TRIGGER:
+			handle_restart_trigger();
+
 		default:
 			break;
 		}
@@ -206,6 +209,12 @@ void Networking::send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp) {
 void Networking::send_restart() {
 	Msg m;
 	m.type = _RESTART;
+	SDLNetUtils::serialized_send(m, sock);
+}
+
+void Networking::send_restart_trigger() {
+	Msg m;
+	m.type = _RESTART_TRIGGER;
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -263,4 +272,8 @@ void Networking::handle_dead(const DeadMsg& m) {
 
 void Networking::handle_restart() {
 	Game::Instance()->get_wolves().restart();
+}
+
+void Networking::handle_restart_trigger() {
+	Game::Instance()->get_wolves().stopMovement();
 }

@@ -15,7 +15,8 @@ enum MsgId : Uint8 {
 	_PLAYER_INFO,
 	_SHOOT,
 	_DEAD,
-	_RESTART
+	_RESTART,
+	_RESTART_TRIGGER
 };
 
 struct Msg {

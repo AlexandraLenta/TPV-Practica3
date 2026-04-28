@@ -159,6 +159,7 @@ public:
 
 	void restart();
 	void check_restart();
+	void stopMovement();
 
 	int get_xres() {
 		return _xres;

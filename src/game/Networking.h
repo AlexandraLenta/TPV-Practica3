@@ -30,6 +30,7 @@ public:
 	void send_shoot(Uint8 id);
 	void send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp);
 	void send_restart();
+	void send_restart_trigger();
 
 private:
 
@@ -40,6 +41,7 @@ private:
 	void handle_shoot(const ShootMsg& m);
 	void handle_dead(const DeadMsg& m);
 	void handle_restart();
+	void handle_restart_trigger();
 
 	NET_StreamSocket* sock;
 	Uint8 _client_Id;

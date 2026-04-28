@@ -824,3 +824,7 @@ void LittleWolf::check_restart() {
 
 	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
 }
+
+void LittleWolf::stopMovement() {
+	_canMove = false;
+}
