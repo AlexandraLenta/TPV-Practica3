@@ -13,6 +13,7 @@
 #include <string>
 #include <fstream>
 
+
 #include "../sdlutils/InputHandler.h"
 
 class LittleWolf {
@@ -138,6 +139,14 @@ public:
 	// update the world, etc
 	void update();
 
+	Player* getPlayers() {
+		return _players;
+	}
+
+	int getMaxPlayers() {
+		return _max_player;
+	}
+
 	void send_my_info();
 	void removePlayer(Uint8 id);	
 	void killPlayer(Uint8 id);
@@ -155,6 +164,11 @@ public:
 	}
 
 private:
+	bool _canMove = true;
+	float _resetTime = 0.0f;
+
+	void resetPlayer(Uint8 id);
+	bool can_spawn_in_pos(int row, int col);
 
 	// mark all (used) player alive
 	void bringAllToLife();
@@ -175,6 +189,8 @@ private:
 
 	// Moves the player when w,a,s,d are held down. Handles collision detection for the walls.
 	bool shoot(Player& p);
+
+	void shootNetwork(Uint8 id);
 
 	// Spins the player when keys grid_h,l are held down. When left-shit is held down the move is slower
 	inline void spin(Player& p);

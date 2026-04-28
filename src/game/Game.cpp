@@ -76,7 +76,7 @@ bool Game::init_game(const char* host, Uint16 port) {
 
 	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
 
-	// add some players
+	// add player
 	_little_wolf->addPlayer(_net->get_client_id());
 
 	return true;
@@ -140,5 +140,8 @@ void Game::check_collisions() {
 		return;
 
 	// check if the players are in valid positions
+	//for (auto& p : _little_wolf->getPlayers()) {
+
+	//}
 }
 

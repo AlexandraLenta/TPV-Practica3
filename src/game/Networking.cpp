@@ -161,13 +161,16 @@ void Networking::update() {
 	}
 }
 
-void Networking::send_state(const Vector2D& pos, float rot) {
+void Networking::send_state(const Vector2D& pos, float rot, const Vector2D& oldPos, float oldRot) {
 	PlayerStateMsg m;
 	m.type = _PLAYER_STATE;
 	m.clientId = _client_Id;
 	m.x = pos.getX();
 	m.y = pos.getY();
 	m.rot = rot;
+	m.oldX = oldPos.getX();
+	m.oldY = oldPos.getY();
+	m.oldRot = oldRot;
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -227,6 +230,14 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 	if (m.clientId != _client_Id) {
 		Game::Instance()->get_wolves().update_player_state(m.clientId, m.x,
 			m.y, m.rot);
+	}
+
+	if (_client_Id == _master_Id) {
+		auto* playerList = Game::Instance()->get_wolves().getPlayers();
+		int maxPlayers = Game::Instance()->get_wolves().getMaxPlayers();
+		for (int i = 0; i < maxPlayers; i++) {
+
+		}
 	}
 }
 

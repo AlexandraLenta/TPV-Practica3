@@ -70,13 +70,29 @@ void LittleWolf::update() {
 	if (p.state != ALIVE)
 		return;
 
-	spin(p);  // handle spinning
-	move(p);  // handle moving
-	shoot(p); // handle shooting
+	// save position and rotation before movement
+	Point oldPos = p.where;
+	float oldRot = p.theta;
 
-	// send player's state
+	// check if we can do actions
+	if (_canMove && p.state == ALIVE) {
+		spin(p);  // handle spinning
+		move(p);  // handle moving
+		shootNetwork(p.id); // handle shooting
+	}
+	// can't move means we are waiting for the game to restart
+	else if (!_canMove) {
+		if (sdlutils().currRealTime() > _resetTime) { // TODO: change this with virtual timer and stuff
+			if (Game::Instance()->get_networking().is_master()) { // if we are the master, we restart the game
+				Game::Instance()->get_networking().send_restart();
+			}
+
+		}
+	}
+
+	// send player's state (new position and old position)
 	Game::Instance()->get_networking().send_state({ p.where.x, p.where.y },
-		p.theta);
+		p.theta, { oldPos.x, oldPos.y }, oldRot);
 }
 
 void LittleWolf::load(std::string filename) {
@@ -247,6 +263,25 @@ bool LittleWolf::addPlayer(Uint8 id) {
 
 	if (_players[id].state != NOT_USED)
 		return false;
+	
+	resetPlayer(id);
+
+	_curr_player_id = id;
+
+	send_my_info();
+
+	return true;
+}
+
+void LittleWolf::resetPlayer(Uint8 id) {
+	assert(id < _max_player);
+
+	Point oldPos = _players[id].where;
+
+	// if the position is within bounds
+	if (oldPos.x >= 0 && oldPos.x < _map.walling_width && oldPos.y >= 0 && oldPos.y < _map.walling_height) {
+		_map.walling[(int)oldPos.y][(int)oldPos.x] = 0;
+	}
 
 	auto& rand = sdlutils().rand();
 
@@ -257,8 +292,8 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	// search for an empty cell
 	Uint16 row = orow;
 	Uint16 col = (ocol + 1) % _map.walling_width;
-	while (!((orow == row) && (ocol == col)) && _map.walling[row][col] != 0) {
-		col = (col + 1) % _map.user_walling_width;
+	while (!((orow == row) && (ocol == col)) && !can_spawn_in_pos(row, col)) {
+		col = (col + 1) % _map.walling_width;
 		if (col == 0)
 			row = (row + 1) % _map.walling_height;
 	}
@@ -266,7 +301,7 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	// handle the case where the search has failed, which in principle should never
 	// happen unless we start with map with few empty cells
 	if (row >= _map.walling_height)
-		return false;
+		return;
 
 	// initialize the player
 	Player p = { //
@@ -283,11 +318,23 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	// note that player <id> is stored in the map as player_to_tile(id) -- which is id+10
 	_map.walling[(int)p.where.y][(int)p.where.x] = player_to_tile(id);
 	_players[id] = p;
+}
 
-	_curr_player_id = id;
+// check if we spawn out of bounds or not
+bool LittleWolf::can_spawn_in_pos(int row, int col) {
+	for (int dy = -1; dy <= 1; dy++) {
+		for (int dx = -1; dx <= 1; dx++) {
+			int r = row + dy;
+			int c = col + dx;
 
-	send_my_info();
+			if (r < 0 || r >= _map.walling_height ||
+				c < 0 || c >= _map.walling_width)
+				return false;
 
+			if (_map.walling[r][c] != 0)
+				return false;
+		}
+	}
 	return true;
 }
 
@@ -477,6 +524,14 @@ void LittleWolf::render_upper_view() {
 		}
 	}
 
+	if (!_canMove) {
+		Texture restart_msg(sdlutils().renderer(), "GAME WILL RESTART IN 5 SECONDS", sdlutils().fonts().at("MFR24"), build_sdlcolor(color_rgba(10)));
+
+		SDL_FRect dest = build_sdlfrect(sdlutils().width() / 4, sdlutils().height() / 2, restart_msg.width(), restart_msg.height());
+
+		restart_msg.render(dest);
+	}
+
 }
 
 void LittleWolf::render_players_info() {
@@ -618,6 +673,17 @@ bool LittleWolf::shoot(Player& p) {
 		}
 	}
 	return false;
+}
+
+// shoot if we're online
+void LittleWolf::shootNetwork(Uint8 id) {
+	Player& p = _players[id];
+	Player& currP = _players[_curr_player_id];
+
+	auto& ihdlr = ih();
+	if (ihdlr.keyDownEvent() && ihdlr.isKeyDown(SDL_SCANCODE_SPACE)) {
+		//Game::Instance()->get_networking().send_shoot(id);
+	}
 }
 
 void LittleWolf::switchToNextPlayer() {
