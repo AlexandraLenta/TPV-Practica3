@@ -82,11 +82,11 @@ void LittleWolf::update() {
 	}
 	// can't move means we are waiting for the game to restart
 	else if (!_canMove) {
-		if (sdlutils().currRealTime() > _resetTime) { // TODO: change this with virtual timer and stuff
+		auto& vt = sdlutils().virtualTimer();
+		if (vt.currRealTime() > _resetTime) { 
 			if (Game::Instance()->get_networking().is_master()) { // if we are the master, we restart the game
 				Game::Instance()->get_networking().send_restart();
 			}
-
 		}
 	}
 
@@ -793,13 +793,34 @@ void LittleWolf::removePlayer(Uint8 id) {
 }
 
 void LittleWolf::restart() {
+	_canMove = true;
 	// bring all dead players to life -- all stay in the same position
 	for (auto i = 0u; i < _max_player; i++) {
+		std::cout << "Player with id " << (int)_curr_player_id << " restarting player with id " << i << '\n';
 		Player& p = _players[i];
 		if (p.state == DEAD) {
 			p.state = ALIVE;
 			p.velocity.x = 0.0f;
 			p.velocity.y = 0.f;
 		}
+		if (p.state != NOT_USED)
+			resetPlayer(i);
 	}
+}
+
+void LittleWolf::check_restart() {
+	int aliveCounter = 0;
+	for (auto i = 0u; i < _max_player; i++) {
+		Player& p = _players[i];
+		if (p.state == ALIVE) {
+			aliveCounter++;
+		}
+		if (aliveCounter >= 2) {
+			return;
+		}
+ 	}
+
+	_canMove = false; // no se pueden mover
+
+	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
 }

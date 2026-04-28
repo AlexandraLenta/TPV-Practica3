@@ -255,6 +255,10 @@ void Networking::handle_shoot(const ShootMsg& m) {
 void Networking::handle_dead(const DeadMsg& m) {
 	Game::Instance()->get_wolves().killPlayer(m.clientId);
 	Game::Instance()->get_wolves().play_shootSFX(m.clientId, false); // false: play pain sound
+
+	if (_client_Id == _master_Id) {
+		Game::Instance()->get_wolves().check_restart();
+	}
 }
 
 void Networking::handle_restart() {

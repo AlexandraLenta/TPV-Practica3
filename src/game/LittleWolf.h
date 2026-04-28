@@ -158,6 +158,7 @@ public:
 	int shoot(Uint8 id);
 
 	void restart();
+	void check_restart();
 
 	int get_xres() {
 		return _xres;
@@ -169,7 +170,7 @@ public:
 
 private:
 	bool _canMove = true;
-	float _resetTime = 0.0f;
+	float _resetTime = 5000; // 5 seconds to reset
 
 	void resetPlayer(Uint8 id);
 	bool can_spawn_in_pos(int row, int col);
