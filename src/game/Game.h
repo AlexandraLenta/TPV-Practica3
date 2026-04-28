@@ -18,6 +18,10 @@ public:
 	inline Networking& get_networking() {
 		return *_net;
 	}
+
+	LittleWolf& get_wolves() {
+		return *_little_wolf;
+	}
 private:
 	Game();
 	virtual ~Game();

@@ -138,6 +138,14 @@ public:
 	// update the world, etc
 	void update();
 
+	void send_my_info();
+	void removePlayer(Uint8 id);	
+	void killPlayer(Uint8 id);
+	void update_player_state(Uint8 id, float x, float y, float rot);
+	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
+
+	void restart();
+
 	int get_xres() {
 		return _xres;
 	}
@@ -156,12 +164,6 @@ private:
 
 	// mute/unmute sound
 	void muteSound();
-
-	void send_my_info();
-	void killPlayer(Uint8 id);
-	void update_player_state(Uint8 id, float x, float y, float rot);
-	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
-	void removePlayer(Uint8 id);
 
 	// Calculates wall size using the <corrected> ray to the wall.
 	Wall project(const int xres, const int yres, const float focal,

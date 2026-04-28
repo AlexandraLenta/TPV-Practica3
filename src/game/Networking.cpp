@@ -6,6 +6,7 @@
 
 #include "../sdlutils/SDLUtils.h"
 #include "Game.h"
+#include "LittleWolf.h"
 
 Networking::Networking() :
 	sock(nullptr), _client_Id(0), _master_Id(0) {
@@ -214,38 +215,32 @@ void Networking::send_restart() {
 }
 
 void Networking::handle_new_client(Uint8 id) {
-	//if (id != _client_Id)
-		//Game::Instance()->get_fighters().send_my_info();
+	if (id != _client_Id)
+		Game::Instance()->get_wolves().send_my_info();
 }
 
 void Networking::handle_disconnet(Uint8 id) {
-	//Game::Instance()->get_fighters().removePlayer(id);
+	Game::Instance()->get_wolves().removePlayer(id);
 }
 
 void Networking::handle_player_state(const PlayerStateMsg& m) {
-	//if (m.clientId != _client_Id) {
-	//	Game::Instance()->get_fighters().update_player_state(m.clientId, m.x,
-	//		m.y, m.w, m.h, m.rot);
-	//}
+	if (m.clientId != _client_Id) {
+		Game::Instance()->get_wolves().update_player_state(m.clientId, m.x,
+			m.y, m.rot);
+	}
 }
 
 void Networking::handle_player_info(const PlayerInfoMsg& m) {
-	//if (m.clientId != _client_Id) {
-	//	Game::Instance()->get_fighters().update_player_info(m.clientId, m.x,
-	//		m.y, m.w, m.h, m.rot, m.state);
-	//}
-}
-
-void Networking::handle_shoot(const ShootMsg& m) {
-	//Game::Instance()->get_bullets().shoot(Vector2D(m.x, m.y),
-	//	Vector2D(m.vx, m.vy), m.w, m.h, m.rot, m.clientId, m.timestamp);
+	if (m.clientId != _client_Id) {
+		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
+			m.y, m.rot, m.state);
+	}
 }
 
 void Networking::handle_dead(const DeadMsg& m) {
-	//Game::Instance()->get_fighters().killPlayer(m.clientId);
-	//Game::Instance()->get_bullets().disable_bullet(m.shooter, m.timestamp);
+	Game::Instance()->get_wolves().killPlayer(m.clientId);
 }
 
 void Networking::handle_restart() {
-	//Game::Instance()->get_fighters().restart();
+	Game::Instance()->get_wolves().restart();
 }

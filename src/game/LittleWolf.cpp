@@ -298,7 +298,7 @@ void LittleWolf::render() {
 		render_upper_view();
 	else
 		render_map(_players[_curr_player_id]);
-
+	
 	// render the identifiers, state, etc
 	render_players_info();
 
@@ -682,4 +682,16 @@ void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Uint8
 
 void LittleWolf::removePlayer(Uint8 id) {
 	_players[id].state = PlayerState::NOT_USED;
+}
+
+void LittleWolf::restart() {
+	// bring all dead players to life -- all stay in the same position
+	for (auto i = 0u; i < _max_player; i++) {
+		Player& p = _players[i];
+		if (p.state == DEAD) {
+			p.state = ALIVE;
+			p.velocity.x = 0.0f;
+			p.velocity.y = 0.f;
+		}
+	}
 }
