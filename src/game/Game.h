@@ -22,6 +22,7 @@ private:
 	Game();
 	virtual ~Game();
 	bool init(const char* map);
+	void check_collisions();
 
 	Networking* _net;
 	LittleWolf* _little_wolf;

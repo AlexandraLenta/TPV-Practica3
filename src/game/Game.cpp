@@ -8,11 +8,15 @@
 #include "Networking.h"
 
 Game::Game() :
-	_little_wolf() //
+	_little_wolf(nullptr) //
 {
 }
 
 Game::~Game() {
+	delete _little_wolf;
+
+	// close SDLNet
+	SDLNetUtils::close_SDLNet();
 
 	// release InputHandler if the instance was created correctly.
 	if (InputHandler::HasInstance())
@@ -22,11 +26,15 @@ Game::~Game() {
 	if (SDLUtils::HasInstance())
 		SDLUtils::Release();
 
-	delete _little_wolf;
 }
 
 bool Game::init(const char* map) {
 	_map = map;
+
+	_little_wolf = new LittleWolf();
+
+	// load a map
+	_little_wolf->load(_map);
 
 	// initialize the SDL singleton
 	if (!SDLUtils::Init("[Little Wolf: " + std::string(map) + "]",
@@ -36,6 +44,7 @@ bool Game::init(const char* map) {
 
 		std::cerr << "Something went wrong while initializing SDLUtils"
 			<< std::endl;
+
 		return false;
 	}
 
@@ -45,21 +54,17 @@ bool Game::init(const char* map) {
 			<< std::endl;
 		return false;
 
-	}
-
-	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
-
-	// add some players
-	_little_wolf->addPlayer(0);
-	_little_wolf->addPlayer(1);
-	_little_wolf->addPlayer(2);
-	_little_wolf->addPlayer(3);
+	}	
+	
+	// initialize SDLNet
+	SDLNetUtils::init_SDLNet();
 
 	return true;
 
 }
 
 bool Game::init_game(const char* host, Uint16 port) {
+	std::cout << "Initializing game...\n";
 
 	_net = new Networking();
 
@@ -67,10 +72,12 @@ bool Game::init_game(const char* host, Uint16 port) {
 	if (!_net->init(host, port))
 		return false;
 
-	_little_wolf = new LittleWolf();	
+	std::cout << "Game initialized!\n";
 
-	// load a map
-	_little_wolf->load(_map);
+	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
+
+	// add some players
+	_little_wolf->addPlayer(_net->get_client_id());
 
 	return true;
 
@@ -83,8 +90,11 @@ void Game::start() {
 
 	auto& ihdlr = ih();
 
+	auto& vt = sdlutils().virtualTimer();
+	vt.resetTime();
+
 	while (!exit) {
-		Uint32 startTime = sdlutils().currRealTime();
+		Uint32 startTime = vt.regCurrTime();
 
 		// refresh the input handler
 		ihdlr.refresh();
@@ -96,23 +106,39 @@ void Game::start() {
 				exit = true;
 				continue;
 			}
+			
+			if (ihdlr.isKeyDown(SDL_SCANCODE_R)) {
+				_net->send_restart();
+			}
 
 		}
 
 		_little_wolf->update();
+		_net->update();
+
+		check_collisions();
 
 		// the clear is not necessary since the texture we copy to the window occupies the whole screen
 		// sdlutils().clearRenderer();
 
 		_little_wolf->render();
+		
 
 		sdlutils().presentRenderer();
 
-		Uint32 frameTime = sdlutils().currRealTime() - startTime;
+		Uint32 frameTime = vt.currRealTime() - startTime;
 
 		if (frameTime < 10)
 			SDL_Delay(10 - frameTime);
 	}
+	_net->disconnect();
 
+}
+
+void Game::check_collisions() {
+	if (!_net->is_master())
+		return;
+
+	// check if the players are in valid positions
 }
 

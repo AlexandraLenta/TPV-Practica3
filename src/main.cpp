@@ -32,6 +32,7 @@ void client(const char* host, Uint16 port) {
 			}
 			Game::Release();
 		}
+		std::cout << "unable to initialize game.\n";
 	}
 	catch (const std::string& e) { // catch exceptions thrown as strings
 		std::cerr << e << std::endl;
