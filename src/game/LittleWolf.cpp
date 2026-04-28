@@ -275,12 +275,10 @@ bool LittleWolf::addPlayer(Uint8 id) {
 
 void LittleWolf::resetPlayer(Uint8 id) {
 	assert(id < _max_player);
+	Point oldPlayerPos = _players[id].where;
 
-	Point oldPos = _players[id].where;
-
-	// if the position is within bounds
-	if (oldPos.x >= 0 && oldPos.x < _map.walling_width && oldPos.y >= 0 && oldPos.y < _map.walling_height) {
-		_map.walling[(int)oldPos.y][(int)oldPos.x] = 0;
+	if (oldPlayerPos.x >= 0 && oldPlayerPos.x < _map.walling_width && oldPlayerPos.y >= 0 && oldPlayerPos.y < _map.walling_height) {
+		_map.walling[(int)oldPlayerPos.y][(int)oldPlayerPos.x] = 0;
 	}
 
 	auto& rand = sdlutils().rand();
@@ -317,7 +315,9 @@ void LittleWolf::resetPlayer(Uint8 id) {
 
 	// note that player <id> is stored in the map as player_to_tile(id) -- which is id+10
 	_map.walling[(int)p.where.y][(int)p.where.x] = player_to_tile(id);
+	std::cout << "Map walling: " << (int)_map.walling[(int)p.where.y][(int)p.where.x] << '\n';
 	_players[id] = p;
+
 }
 
 // check if we spawn out of bounds or not
@@ -535,7 +535,6 @@ void LittleWolf::render_upper_view() {
 }
 
 void LittleWolf::render_players_info() {
-
 	uint_fast16_t y = 0;
 
 	for (auto i = 0u; i < _max_player; i++) {
@@ -543,7 +542,6 @@ void LittleWolf::render_players_info() {
 
 		// render player info if it is used
 		if (s != NOT_USED) {
-
 			std::string msg = (i == _curr_player_id ? "*P" : " P")
 				+ std::to_string(i) + (s == DEAD ? " (dead)" : "");
 
@@ -738,10 +736,29 @@ void LittleWolf::update_player_state(Uint8 id, float x, float y, float rot) {
 
 	Player& p = _players[id];
 
+	int old_x = (int)p.where.x; // take position before updating
+	int old_y = (int)p.where.y;
+
 	p.where.x = x;
 	p.where.y = y;
 	p.id = id;
 	p.theta = rot;
+
+	if (_map.walling[old_y][old_x] == player_to_tile(id)) { // if this player was there before, remove him
+		_map.walling[old_y][old_x] = 0;
+	}
+
+	int new_x = (int)p.where.x;
+	int new_y = (int)p.where.y;
+
+	if (_map.walling[new_y][new_x] == 0) { // if there is no player in the new tile, place this player there
+		_map.walling[new_y][new_x] = player_to_tile(id);
+	}
+	else { // if there is already a player there, move the current player to his old position
+		p.where.x = old_x;
+		p.where.y = old_y;
+		_map.walling[old_y][old_x] = player_to_tile(id);
+	}
 
 }
 
@@ -752,11 +769,23 @@ void LittleWolf::killPlayer(Uint8 id) {
 void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Uint8 state) {
 	Player& p = _players[id];
 
+	int old_x = (int)p.where.x; // cogemos la posicion del jugador con el id dado antes de darle el nuevo x e y
+	int old_y = (int)p.where.y;
+
 	p.where.x = x;
 	p.where.y = y;
 	p.id = id;
 	p.theta = rot;
 	p.state = static_cast<PlayerState>(state);
+
+	if (_map.walling[old_y][old_x] == player_to_tile(id)) {
+		_map.walling[old_y][old_x] = 0;
+	}
+
+	int new_x = (int)p.where.x;
+	int new_y = (int)p.where.y;
+
+	_map.walling[new_y][new_x] = player_to_tile(id);
 }
 
 void LittleWolf::removePlayer(Uint8 id) {

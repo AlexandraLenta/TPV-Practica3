@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string>
 #include <fstream>
+#include "../utils/Vector2D.h"
 
 
 #include "../sdlutils/InputHandler.h"
