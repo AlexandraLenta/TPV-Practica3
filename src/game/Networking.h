@@ -27,7 +27,7 @@ public:
 	void send_my_info(const Vector2D& pos, float rot,
 		Uint8 state);
 
-	void send_shoot(Vector2D p, Vector2D v, int width, int height, float r);
+	void send_shoot(Uint8 id);
 	void send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp);
 	void send_restart();
 

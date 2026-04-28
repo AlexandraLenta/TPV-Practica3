@@ -186,19 +186,11 @@ void Networking::send_my_info(const Vector2D& pos, float rot,
 	SDLNetUtils::serialized_send(m, sock);
 }
 
-void Networking::send_shoot(Vector2D p, Vector2D v, int width, int height,
-	float r) {
+void Networking::send_shoot(Uint8 id) {
 	ShootMsg m;
 	m.type = _SHOOT;
 	m.clientId = _client_Id;
-	m.x = p.getX();
-	m.y = p.getY();
-	m.vx = v.getX();
-	m.vy = v.getY();
-	m.w = width;
-	m.h = height;
-	m.rot = r;
-	m.timestamp = sdlutils().virtualTimer().currTime();
+	
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -248,8 +240,21 @@ void Networking::handle_player_info(const PlayerInfoMsg& m) {
 	}
 }
 
+void Networking::handle_shoot(const ShootMsg& m) {
+	Game::Instance()->get_wolves().play_shootSFX(m.clientId, true); // true: play gunshot
+
+	if (_client_Id == _master_Id) {
+		int victimID = Game::Instance()->get_wolves().shoot(m.clientId);
+
+		if (victimID != -1) {
+			send_dead(victimID, m.clientId, SDL_GetTicks());
+		}
+	}
+}
+
 void Networking::handle_dead(const DeadMsg& m) {
 	Game::Instance()->get_wolves().killPlayer(m.clientId);
+	Game::Instance()->get_wolves().play_shootSFX(m.clientId, false); // false: play pain sound
 }
 
 void Networking::handle_restart() {

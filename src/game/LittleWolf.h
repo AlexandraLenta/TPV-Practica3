@@ -153,6 +153,9 @@ public:
 	void update_player_state(Uint8 id, float x, float y, float rot);
 	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
 
+	void play_shootSFX(Uint8 id, bool shot);
+	int shoot(Uint8 id);
+
 	void restart();
 
 	int get_xres() {
@@ -186,9 +189,6 @@ private:
 	// Casts a ray from <where> in unit <direction> until a <walling> tile is hit.
 	Hit cast(const Point where, Point direction, Uint8** walling,
 		bool ignore_players, bool ignore_deads);
-
-	// Moves the player when w,a,s,d are held down. Handles collision detection for the walls.
-	bool shoot(Player& p);
 
 	void shootNetwork(Uint8 id);
 
