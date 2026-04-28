@@ -40,11 +40,9 @@ struct PlayerStateMsg : MsgWithClientId {
 
 	float x;
 	float y;
-	int w;
-	int h;
 	float rot;
 
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, w, h, rot)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot)
 
 };
 

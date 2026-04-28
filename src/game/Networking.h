@@ -23,7 +23,7 @@ public:
 		return _client_Id == _master_Id;
 	}
 
-	void send_state(const Vector2D& pos, float w, float h, float rot);
+	void send_state(const Vector2D& pos, float rot);
 	void send_my_info(const Vector2D& pos, float w, float h, float rot,
 		Uint8 state);
 

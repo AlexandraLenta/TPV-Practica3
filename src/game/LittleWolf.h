@@ -22,6 +22,16 @@ public:
 	struct Point {
 		float x;
 		float y;
+
+		Point(float x, float y) : x(x), y(y) {
+
+		}
+
+		// construct from Vector2D
+		Point(Vector2D v) {
+			x = v.getX();
+			y = v.getY();
+		}
 	};
 
 	// Used to represent a position where a ray hits, and which tile

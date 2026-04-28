@@ -160,14 +160,12 @@ void Networking::update() {
 	}
 }
 
-void Networking::send_state(const Vector2D& pos, float w, float h, float rot) {
+void Networking::send_state(const Vector2D& pos, float rot) {
 	PlayerStateMsg m;
 	m.type = _PLAYER_STATE;
 	m.clientId = _client_Id;
 	m.x = pos.getX();
 	m.y = pos.getY();
-	m.w = w;
-	m.h = h;
 	m.rot = rot;
 	SDLNetUtils::serialized_send(m, sock);
 }

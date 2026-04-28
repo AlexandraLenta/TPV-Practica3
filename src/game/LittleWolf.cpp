@@ -12,6 +12,8 @@
 #include "../sdlutils/InputHandler.h"
 #include "../sdlutils/SDLUtils.h"
 #include "../sdlutils/Texture.h"
+#include "Game.h"
+#include "Networking.h"
 
 LittleWolf::LittleWolf() :
 	_show_help(true), //
@@ -64,13 +66,17 @@ void LittleWolf::update() {
 
 	Player& p = _players[_curr_player_id];
 
-	// dead player don't move/spin/shoot
+	// dead players don't move/spin/shoot
 	if (p.state != ALIVE)
 		return;
 
 	spin(p);  // handle spinning
 	move(p);  // handle moving
 	shoot(p); // handle shooting
+
+	// send player's state
+	Game::Instance()->get_networking().send_state({ p.where.x, p.where.y },
+		p.theta);
 }
 
 void LittleWolf::load(std::string filename) {
