@@ -24,10 +24,12 @@ public:
 	}
 
 	void send_state(const Vector2D& pos, float rot, const Vector2D& oldPos, float oldRot);
-	void send_my_info(const Vector2D& pos, float rot,
+	void send_my_info(const Vector2D& pos, float rot, int hp, int score,
 		Uint8 state);
-
 	void send_shoot(Uint8 id);
+	void send_damaged_info(Uint8 id, int hp);
+	void send_score_info(Uint8 id, int score);
+
 	void send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp);
 	void send_restart();
 	void send_restart_trigger();
@@ -42,6 +44,8 @@ private:
 	void handle_dead(const DeadMsg& m);
 	void handle_restart();
 	void handle_restart_trigger();
+	void handle_damaged(const PlayerDmgInfoMsg& m);
+	void handle_score(const PlayerScoreInfoMsg& m);
 
 	NET_StreamSocket* sock;
 	Uint8 _client_Id;

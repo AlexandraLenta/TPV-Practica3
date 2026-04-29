@@ -100,6 +100,8 @@ void Networking::update() {
 	MsgWithClientId m4;
 	PlayerInfoMsg m5;
 	DeadMsg m6;
+	PlayerDmgInfoMsg m7;
+	PlayerScoreInfoMsg m8;
 
 	while (true) {
 		SDLNetUtils::buff_t buf = SDLNetUtils::receive(sock);
@@ -159,6 +161,16 @@ void Networking::update() {
 			handle_restart_trigger();
 			break;
 
+		case _DAMAGE:
+			m7.deserialize(buf.data);
+			handle_damaged(m7);
+			break;
+			
+		case _SCORE:
+			m8.deserialize(buf.data);
+			handle_score(m8);
+			break;
+
 		default:
 			break;
 		}
@@ -178,7 +190,7 @@ void Networking::send_state(const Vector2D& pos, float rot, const Vector2D& oldP
 	SDLNetUtils::serialized_send(m, sock);
 }
 
-void Networking::send_my_info(const Vector2D& pos, float rot,
+void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
 	Uint8 state) {
 	PlayerInfoMsg m;
 	m.type = _PLAYER_INFO;
@@ -186,15 +198,25 @@ void Networking::send_my_info(const Vector2D& pos, float rot,
 	m.x = pos.getX();
 	m.y = pos.getY();
 	m.rot = rot;
+	m.hp = hp;
+	m.score = score;
 	m.state = state;
 	SDLNetUtils::serialized_send(m, sock);
 }
 
-void Networking::send_shoot(Uint8 id) {
-	ShootMsg m;
-	m.type = _SHOOT;
-	m.clientId = _client_Id;
-	
+void Networking::send_damaged_info(Uint8 id, int hp) {
+	PlayerDmgInfoMsg m;
+	m.type = _DAMAGE;
+	m.clientId = id;
+	m.hp = hp;
+	SDLNetUtils::serialized_send(m, sock);
+}
+
+void Networking::send_score_info(Uint8 id, int score) {
+	PlayerScoreInfoMsg m;
+	m.type = _DAMAGE;
+	m.clientId = id;
+	m.score = score;
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -204,6 +226,13 @@ void Networking::send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp) {
 	m.clientId = id;
 	m.shooter = shooter;
 	m.timestamp = timestamp;
+	SDLNetUtils::serialized_send(m, sock);
+}
+
+void Networking::send_shoot(Uint8 id) {
+	ShootMsg m;
+	m.type = _SHOOT;
+	m.clientId = _client_Id; 
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -246,7 +275,7 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 void Networking::handle_player_info(const PlayerInfoMsg& m) {
 	if (m.clientId != _client_Id) {
 		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
-			m.y, m.rot, m.state);
+			m.y, m.rot, m.hp, m.score, m.state);
 	}
 }
 
@@ -279,4 +308,12 @@ void Networking::handle_restart() {
 
 void Networking::handle_restart_trigger() {
 	Game::Instance()->get_wolves().triggerRestart();
+}
+
+void Networking::handle_damaged(const PlayerDmgInfoMsg& m) {
+	Game::Instance()->get_wolves().update_player_hp(m.clientId, m.hp);
+}
+
+void Networking::handle_score(const PlayerScoreInfoMsg& m) {
+	Game::Instance()->get_wolves().update_player_score(m.clientId, m.score);
 }

@@ -299,7 +299,8 @@ void LittleWolf::resetPlayer(Uint8 id) {
 					2.0f, 			// Speed.
 					0.9f, 			// Acceleration.
 					0.0f, 			// Rotation angle in radians.
-					100,
+					100,			// health points
+					0,				// score points
 					ALIVE 			// Player state
 	};
 
@@ -680,8 +681,15 @@ void LittleWolf::damage_player(Uint8 shooterId, Uint8 victimId) {
 
 	victim.hp -= dmg;
 
-	if (victim.hp <= 0)
+	if (victim.hp <= 0) {
+		victim.hp = 0;
 		victim.state = DEAD;
+	}
+
+	shooter.score += 1;
+	
+	Game::Instance()->get_networking().send_damaged_info(victimId, victim.hp);
+	Game::Instance()->get_networking().send_score_info(victimId, shooter.score);
 }
 
 bool LittleWolf::is_dead(Uint8 id) {
@@ -747,7 +755,7 @@ void LittleWolf::send_my_info() {
 	Player& p = _players[_curr_player_id];
 
 	Game::Instance()->get_networking().send_my_info(Vector2D(p.where.x, p.where.y),
-		p.theta, p.state);
+		p.theta, p.hp, p.score, p.state);
 }
 
 void LittleWolf::update_player_state(Uint8 id, float x, float y, float rot) {
@@ -784,7 +792,7 @@ void LittleWolf::killPlayer(Uint8 id) {
 	_players[id].state = PlayerState::DEAD;
 }
 
-void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Uint8 state) {
+void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int hp, int score, Uint8 state) {
 	Player& p = _players[id];
 
 	int old_x = (int)p.where.x; // cogemos la posicion del jugador con el id dado antes de darle el nuevo x e y
@@ -795,6 +803,8 @@ void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Uint8
 	p.id = id;
 	p.theta = rot;
 	p.state = static_cast<PlayerState>(state);
+	p.hp = hp;
+	p.score = score;
 
 	if (_map.walling[old_y][old_x] == player_to_tile(id)) {
 		_map.walling[old_y][old_x] = 0;
@@ -847,4 +857,18 @@ void LittleWolf::check_restart() {
 void LittleWolf::triggerRestart() {
 	_canMove = false;
 	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
+}
+
+void LittleWolf::update_player_hp(Uint8 id, int hp) {
+	Player& p = _players[id];
+
+	p.hp = hp;
+
+	std::cout << "ID: " << id << "; new hp: " << hp << '\n';
+}
+
+void LittleWolf::update_player_score(Uint8 id, int score) {
+	Player& p = _players[id];
+
+	p.score = score;
 }

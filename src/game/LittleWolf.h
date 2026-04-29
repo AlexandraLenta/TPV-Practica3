@@ -91,6 +91,7 @@ public:
 		float acceleration;  // acceleration
 		float theta;         // rotation (in rad)
 		int hp = 100;		 // health points
+		int score = 0;		 // score points
 		PlayerState state;   // the state
 	};
 
@@ -157,7 +158,9 @@ public:
 	void removePlayer(Uint8 id);	
 	void killPlayer(Uint8 id);
 	void update_player_state(Uint8 id, float x, float y, float rot);
-	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
+	void update_player_info(Uint8 id, float x, float y, float rot, int hp, int score, Uint8 state);
+	void update_player_hp(Uint8 id, int hp);
+	void update_player_score(Uint8 id, int score);
 
 	void play_shootSFX(Uint8 id, SFX sound);
 	int shoot(Uint8 id);

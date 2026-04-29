@@ -13,6 +13,8 @@ enum MsgId : Uint8 {
 	_SERVER_SHUTDOWN,
 	_PLAYER_STATE,
 	_PLAYER_INFO,
+	_DAMAGE,
+	_SCORE,
 	_SHOOT,
 	_DEAD,
 	_RESTART,
@@ -56,24 +58,24 @@ struct PlayerInfoMsg : MsgWithClientId {
 	float x;
 	float y;
 	float rot;
+	int hp;
+	int score;
 	Uint8 state;
 
 	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, state)
 
 };
 
-struct ShootMsg : MsgWithClientId {
+struct PlayerDmgInfoMsg : MsgWithClientId {
+	int hp;
 
-	float x;
-	float y;
-	float vx;
-	float vy;
-	int w;
-	int h;
-	float rot;
-	Uint32 timestamp;
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, vx, vy, w, h, rot, timestamp)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), hp)
+};
 
+struct PlayerScoreInfoMsg : MsgWithClientId {
+	int score;
+
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), score)
 };
 
 struct DeadMsg : MsgWithClientId {
@@ -84,3 +86,14 @@ struct DeadMsg : MsgWithClientId {
 
 };
 
+struct ShootMsg : MsgWithClientId {
+	float x;
+	float y;
+	float vx;
+	float vy;
+	int w;
+	int h;
+	float rot;
+	Uint32 timestamp;
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, vx, vy, w, h, rot, timestamp)
+};
