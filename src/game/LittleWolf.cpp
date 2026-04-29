@@ -247,13 +247,13 @@ void LittleWolf::load(std::string filename) {
 
 }
 
-bool LittleWolf::addPlayer(Uint8 id) {
+bool LittleWolf::addPlayer(Uint8 id, std::string name) {
 	assert(id < _max_player);
 
 	if (_players[id].state != NOT_USED)
 		return false;
 	
-	resetPlayer(id);
+	resetPlayer(id, name);
 
 	_curr_player_id = id;
 
@@ -262,7 +262,7 @@ bool LittleWolf::addPlayer(Uint8 id) {
 	return true;
 }
 
-void LittleWolf::resetPlayer(Uint8 id) {
+void LittleWolf::resetPlayer(Uint8 id, std::string name) {
 	assert(id < _max_player);
 	Point oldPlayerPos = _players[id].where;
 
@@ -290,6 +290,9 @@ void LittleWolf::resetPlayer(Uint8 id) {
 	if (row >= _map.walling_height)
 		return;
 
+	char username[11];
+	Game::Instance()->string_to_chars(name, username);
+
 	// initialize the player
 	Player p = { //
 			id, //
@@ -301,6 +304,7 @@ void LittleWolf::resetPlayer(Uint8 id) {
 				0.0f, 			// Rotation angle in radians.
 				100,			// health points
 				0,				// score points
+				*username, // name
 				ALIVE 			// Player state
 	};
 
@@ -529,8 +533,8 @@ void LittleWolf::render_players_info() {
 
 		// render player info if it is used
 		if (p.state != NOT_USED) {
-			std::string msg = (i == _curr_player_id ? "*P" : " P")
-				+ std::to_string(i) + (p.state == DEAD ? " (dead)" : " - " + std::to_string(p.hp) + " | " + std::to_string(p.score) + " pts");
+			std::string transformedName = (i == _curr_player_id ? "*" + std::string(p.name) : p.name);
+			std::string msg = transformedName + (p.state == DEAD ? " (dead)" : " - " + std::to_string(p.hp) + " | " + std::to_string(p.score) + " pts");
 
 			Texture info(sdlutils().renderer(), msg,
 				sdlutils().fonts().at("MFR24"),
@@ -833,7 +837,7 @@ void LittleWolf::restart() {
 			p.velocity.y = 0.f;
 		}
 		if (p.state != NOT_USED)
-			resetPlayer(i);
+			resetPlayer(i, p.name);
 	}
 }
 

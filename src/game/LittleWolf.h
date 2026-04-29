@@ -92,6 +92,7 @@ public:
 		float theta;         // rotation (in rad)
 		int hp = 100;		 // health points
 		int score = 0;		 // score points
+		char name[11];
 		PlayerState state;   // the state
 	};
 
@@ -135,7 +136,7 @@ public:
 	void load(std::string filename);
 
 	// add a new player with identifier <id>, returns false if the id is already occupied
-	bool addPlayer(Uint8 id);
+	bool addPlayer(Uint8 id, std::string name);
 
 	// initialize the SDL window information
 	void init(SDL_Window* window, SDL_Renderer* render);
@@ -185,11 +186,13 @@ private:
 	bool _canMove = true;
 	float _resetTime = 5000; // 5 seconds to reset
 
-	void resetPlayer(Uint8 id);
+	void resetPlayer(Uint8 id, std::string name);
 	bool can_spawn_in_pos(int row, int col);
 
 	// remove health and check for death
 	void damage_player(Uint8 shooterId, Uint8 victimId);
+	
+	char* _username;
 
 	//// mark all (used) player alive
 	//void bringAllToLife();

@@ -76,15 +76,24 @@ bool Game::init_game(const char* host, Uint16 port) {
 
 	_little_wolf->init(sdlutils().window(), sdlutils().renderer());
 
+
+	std::string user_name;
+	std::cout << "Enter your username: ";
+	std::cin >> user_name;
+	std::string final_name = user_name.substr(0, MAX_NAME_LENGTH + 1);
+
+	char name[11];
+
+	strcpy_s(name, final_name.c_str());
+
 	// add player
-	_little_wolf->addPlayer(_net->get_client_id());
+	_little_wolf->addPlayer(_net->get_client_id(), name);
 
 	return true;
 
 }
 
 void Game::start() {
-
 	// a boolean to exit the loop
 	bool exit = false;
 
@@ -106,7 +115,7 @@ void Game::start() {
 				exit = true;
 				continue;
 			}
-			
+
 			if (ihdlr.isKeyDown(SDL_SCANCODE_R)) {
 				_net->send_restart();
 			}
@@ -116,13 +125,11 @@ void Game::start() {
 		_little_wolf->update();
 		_net->update();
 
-		check_collisions();
-
 		// the clear is not necessary since the texture we copy to the window occupies the whole screen
 		// sdlutils().clearRenderer();
 
 		_little_wolf->render();
-		
+
 
 		sdlutils().presentRenderer();
 
@@ -134,14 +141,3 @@ void Game::start() {
 	_net->disconnect();
 
 }
-
-void Game::check_collisions() {
-	if (!_net->is_master())
-		return;
-
-	// check if the players are in valid positions
-	//for (auto& p : _little_wolf->getPlayers()) {
-
-	//}
-}
-

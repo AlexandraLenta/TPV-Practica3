@@ -22,15 +22,27 @@ public:
 	LittleWolf& get_wolves() {
 		return *_little_wolf;
 	}
+
+	void string_to_chars(std::string& str, char c_str[11]) {
+		auto i = 0u;
+		for (; i < str.size() && i < 10; i++) c_str[i] = str[i];
+		c_str[i] = 0;
+	}
+	void chars_to_string(std::string& str, char c_str[11]) {
+		c_str[10] = 0;
+		str = std::string(c_str);
+	}
+
 private:
 	Game();
 	virtual ~Game();
 	bool init(const char* map);
-	void check_collisions();
 
 	Networking* _net;
 	LittleWolf* _little_wolf;
 	
 	const char* _map;
+
+	const int MAX_NAME_LENGTH = 10;
 };
 
