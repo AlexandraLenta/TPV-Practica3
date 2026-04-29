@@ -293,15 +293,15 @@ void LittleWolf::resetPlayer(Uint8 id) {
 	// initialize the player
 	Player p = { //
 			id, //
-					viewport(0.8f), // focal
-					{ col + 0.5f, row + 0.5f }, // Where.
-					{ 0.0f, 0.0f }, 			// Velocity.
-					2.0f, 			// Speed.
-					0.9f, 			// Acceleration.
-					0.0f, 			// Rotation angle in radians.
-					100,			// health points
-					0,				// score points
-					ALIVE 			// Player state
+				viewport(0.8f), // focal
+				{ col + 0.5f, row + 0.5f }, // Where.
+				{ 0.0f, 0.0f }, 			// Velocity.
+				2.0f, 			// Speed.
+				0.9f, 			// Acceleration.
+				0.0f, 			// Rotation angle in radians.
+				100,			// health points
+				0,				// score points
+				ALIVE 			// Player state
 	};
 
 	// note that player <id> is stored in the map as player_to_tile(id) -- which is id+10
@@ -689,7 +689,7 @@ void LittleWolf::damage_player(Uint8 shooterId, Uint8 victimId) {
 	shooter.score += 1;
 	
 	Game::Instance()->get_networking().send_damaged_info(victimId, victim.hp);
-	Game::Instance()->get_networking().send_score_info(victimId, shooter.score);
+	Game::Instance()->get_networking().send_score_info(shooter.id, shooter.score);
 }
 
 bool LittleWolf::is_dead(Uint8 id) {
@@ -805,6 +805,8 @@ void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int h
 	p.state = static_cast<PlayerState>(state);
 	p.hp = hp;
 	p.score = score;
+
+	std::cout << p.hp << " " << p.score << '\n';
 
 	if (_map.walling[old_y][old_x] == player_to_tile(id)) {
 		_map.walling[old_y][old_x] = 0;

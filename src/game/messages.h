@@ -62,7 +62,7 @@ struct PlayerInfoMsg : MsgWithClientId {
 	int score;
 	Uint8 state;
 
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, state)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, hp, score, state)
 
 };
 

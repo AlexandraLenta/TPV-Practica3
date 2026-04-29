@@ -201,6 +201,7 @@ void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
 	m.hp = hp;
 	m.score = score;
 	m.state = state;
+
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -276,6 +277,7 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 
 void Networking::handle_player_info(const PlayerInfoMsg& m) {
 	if (m.clientId != _client_Id) {
+		std::cout << "Handle: " << m.hp << ' ' << m.score << '\n';
 		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
 			m.y, m.rot, m.hp, m.score, m.state);
 	}
