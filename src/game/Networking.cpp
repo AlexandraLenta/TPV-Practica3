@@ -157,6 +157,7 @@ void Networking::update() {
 
 		case _RESTART_TRIGGER:
 			handle_restart_trigger();
+			break;
 
 		default:
 			break;
@@ -250,7 +251,7 @@ void Networking::handle_player_info(const PlayerInfoMsg& m) {
 }
 
 void Networking::handle_shoot(const ShootMsg& m) {
-	Game::Instance()->get_wolves().play_shootSFX(m.clientId, true); // true: play gunshot
+	Game::Instance()->get_wolves().play_shootSFX(m.clientId, LittleWolf::SFX::GUNSHOT); // send gunshot sound to each player
 
 	if (_client_Id == _master_Id) {
 		int victimID = Game::Instance()->get_wolves().shoot(m.clientId);
@@ -263,9 +264,9 @@ void Networking::handle_shoot(const ShootMsg& m) {
 
 void Networking::handle_dead(const DeadMsg& m) {
 	Game::Instance()->get_wolves().killPlayer(m.clientId);
-	Game::Instance()->get_wolves().play_shootSFX(m.clientId, false); // false: play pain sound
+	Game::Instance()->get_wolves().play_shootSFX(m.clientId, LittleWolf::SFX::PAIN); // play pain sound for every player
 
-	if (_client_Id == _master_Id) {
+	if (_client_Id == _master_Id) { // the master checks if game should restart
 		Game::Instance()->get_wolves().check_restart();
 	}
 }
@@ -275,5 +276,5 @@ void Networking::handle_restart() {
 }
 
 void Networking::handle_restart_trigger() {
-	Game::Instance()->get_wolves().stopMovement();
+	Game::Instance()->get_wolves().triggerRestart();
 }

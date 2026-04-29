@@ -348,6 +348,10 @@ void LittleWolf::render() {
 			t.render(0, y);
 		}
 	}
+
+	if (!_canMove) {
+		render_restart_message();
+	}
 }
 
 LittleWolf::Hit LittleWolf::cast(const Point where, Point direction,
@@ -513,14 +517,6 @@ void LittleWolf::render_upper_view() {
 		}
 	}
 
-	if (!_canMove) {
-		Texture restart_msg(sdlutils().renderer(), "GAME WILL RESTART IN 5 SECONDS", sdlutils().fonts().at("MFR24"), build_sdlcolor(color_rgba(10)));
-
-		SDL_FRect dest = build_sdlfrect(sdlutils().width() / 4, sdlutils().height() / 2, restart_msg.width(), restart_msg.height());
-
-		restart_msg.render(dest);
-	}
-
 }
 
 void LittleWolf::render_players_info() {
@@ -545,6 +541,14 @@ void LittleWolf::render_players_info() {
 
 		}
 	}
+}
+
+void LittleWolf::render_restart_message() {
+	Texture restart_msg(sdlutils().renderer(), "The game will restart in " + std::to_string(std::roundf(_resetTime - sdlutils().virtualTimer().currRealTime()) / 1000.0f) + " seconds.", sdlutils().fonts().at("MFR24"), build_sdlcolor(color_rgba(10)));
+
+	SDL_FRect dest = build_sdlfrect(sdlutils().width() / 4, sdlutils().height() / 2, restart_msg.width(), restart_msg.height());
+
+	restart_msg.render(dest);
 }
 
 void LittleWolf::move(Player& p) {
@@ -667,7 +671,7 @@ void LittleWolf::shootNetwork(Uint8 id) {
 	}
 }
 
-void LittleWolf::play_shootSFX(Uint8 id, bool shot) {
+void LittleWolf::play_shootSFX(Uint8 id, SFX sound) {
 	Player& shooter = _players[id];
 	Player& currPlayer = _players[_curr_player_id]; // the current player
 
@@ -676,36 +680,36 @@ void LittleWolf::play_shootSFX(Uint8 id, bool shot) {
 
 	float volume = std::min(SoundManager::Instance()->get_master_volume(), SoundManager::Instance()->get_master_volume() / distance);
 
-	if (shot) { // if the sound comes from a gunshot
+	if (sound == GUNSHOT) { // if the sound comes from a gunshot
 		SoundManager::Instance()->set_track_volume("gunshot", volume); // set volume only for this track
 		sdlutils().soundEffects().at("gunshot").play("se");
 	}
-	else { // if sound comes from someone being shot
+	else if (sound == PAIN) { // if sound comes from someone being shot
 		SoundManager::Instance()->set_track_volume("pain", volume); // set volume only for this track
 		sdlutils().soundEffects().at("pain").play("se");
 	}
 }
 
-void LittleWolf::switchToNextPlayer() {
+//void LittleWolf::switchToNextPlayer() {
+//
+//	// search the next player in the palyer's array
+//	int j = (_curr_player_id + 1) % _max_player;
+//	while (j != _curr_player_id && _players[j].state == NOT_USED)
+//		j = (j + 1) % _max_player;
+//
+//	// move to the next player view
+//	_curr_player_id = j;
+//
+//}
 
-	// search the next player in the palyer's array
-	int j = (_curr_player_id + 1) % _max_player;
-	while (j != _curr_player_id && _players[j].state == NOT_USED)
-		j = (j + 1) % _max_player;
-
-	// move to the next player view
-	_curr_player_id = j;
-
-}
-
-void LittleWolf::bringAllToLife() {
-	// bring all dead players to life -- all stay in the same position
-	for (auto i = 0u; i < _max_player; i++) {
-		if (_players[i].state == DEAD) {
-			_players[i].state = ALIVE;
-		}
-	}
-}
+//void LittleWolf::bringAllToLife() {
+//	// bring all dead players to life -- all stay in the same position
+//	for (auto i = 0u; i < _max_player; i++) {
+//		if (_players[i].state == DEAD) {
+//			_players[i].state = ALIVE;
+//		}
+//	}
+//}
 
 void LittleWolf::muteSound() {
 	_mute = !_mute;
@@ -785,7 +789,6 @@ void LittleWolf::restart() {
 	_canMove = true;
 	// bring all dead players to life -- all stay in the same position
 	for (auto i = 0u; i < _max_player; i++) {
-		std::cout << "Player with id " << (int)_curr_player_id << " restarting player with id " << i << '\n';
 		Player& p = _players[i];
 		if (p.state == DEAD) {
 			p.state = ALIVE;
@@ -816,6 +819,7 @@ void LittleWolf::check_restart() {
 	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
 }
 
-void LittleWolf::stopMovement() {
+void LittleWolf::triggerRestart() {
 	_canMove = false;
+	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
 }

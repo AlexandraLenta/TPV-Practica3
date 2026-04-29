@@ -77,6 +77,10 @@ public:
 		NOT_USED, ALIVE, DEAD
 	};
 
+	enum SFX {
+		GUNSHOT, PAIN
+	};
+
 	// player information
 	struct Player {
 		Uint8 id;            // the id
@@ -154,12 +158,14 @@ public:
 	void update_player_state(Uint8 id, float x, float y, float rot);
 	void update_player_info(Uint8 id, float x, float y, float rot, Uint8 state);
 
-	void play_shootSFX(Uint8 id, bool shot);
+	void play_shootSFX(Uint8 id, SFX sound);
 	int shoot(Uint8 id);
 
 	void restart();
 	void check_restart();
-	void stopMovement();
+
+	// stop movement and register reset time. only the master will use it for calculations, the rest use it for display
+	void triggerRestart();
 
 	int get_xres() {
 		return _xres;
@@ -176,11 +182,11 @@ private:
 	void resetPlayer(Uint8 id);
 	bool can_spawn_in_pos(int row, int col);
 
-	// mark all (used) player alive
-	void bringAllToLife();
+	//// mark all (used) player alive
+	//void bringAllToLife();
 
-	// switch to the view of the next player
-	void switchToNextPlayer();
+	//// switch to the view of the next player
+	//void switchToNextPlayer();
 
 	// mute/unmute sound
 	void muteSound();
@@ -209,6 +215,9 @@ private:
 
 	// Render a list of current player
 	void render_players_info();
+
+	// render the restarting message
+	void render_restart_message();
 
 	// These are auxiliary function for vectors, colors, etc. All are from original littlewolf.
 
