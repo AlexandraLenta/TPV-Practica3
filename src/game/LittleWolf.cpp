@@ -342,7 +342,7 @@ void LittleWolf::render() {
 	if (_show_help) {
 		int y = sdlutils().height();
 		for (const char* s : { "usage_1", "usage_2", "usage_3", "usage_4",
-				"usage_5", "usage_6", _mute ? "usage_7" : "usage_8" }) {
+				"usage_5", _mute ? "usage_6" : "usage_7" }) {
 			auto& t = sdlutils().msgs().at(s);
 			y = y - t.height() - 10;
 			t.render(0, y);
@@ -810,6 +810,8 @@ void LittleWolf::check_restart() {
  	}
 
 	_canMove = false; // no se pueden mover
+
+	Game::Instance()->get_networking().send_restart_trigger();
 
 	_resetTime = sdlutils().virtualTimer().currRealTime() + 5000; // the reset time is 5 seconds after we set the restart
 }

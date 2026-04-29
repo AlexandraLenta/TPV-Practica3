@@ -16,9 +16,8 @@
 	{ "id" : "usage_3", "text" : "H/L: turn left/right ", "font" : "MFR12", "color" : "0xffffffff" },
 	{ "id" : "usage_4", "text" : "W/S: move forward/backwards", "font" : "MFR12", "color" : "0xffffffff" },
 	{ "id" : "usage_5", "text" : "D/A: slide left/right", "font" : "MFR12", "color" : "0xffffffff" },
-	{ "id" : "usage_6", "text" : "  N: Next player view", "font" : "MFR12", "color" : "0xffffffff" },
-	{ "id" : "usage_7", "text" : "  M: Unmute", "font" : "MFR12", "color" : "0xffffffff" },
-	{ "id" : "usage_8", "text" : "  M: Mute", "font" : "MFR12", "color" : "0xffffffff" }  
+	{ "id" : "usage_6", "text" : "  M: Unmute", "font" : "MFR12", "color" : "0xffffffff" },
+	{ "id" : "usage_7", "text" : "  M: Mute", "font" : "MFR12", "color" : "0xffffffff" }  
   ],
  
   "sounds" : [
