@@ -90,6 +90,7 @@ public:
 		float speed;         // maximum speed
 		float acceleration;  // acceleration
 		float theta;         // rotation (in rad)
+		int hp = 100;		 // health points
 		PlayerState state;   // the state
 	};
 
@@ -161,6 +162,8 @@ public:
 	void play_shootSFX(Uint8 id, SFX sound);
 	int shoot(Uint8 id);
 
+	bool is_dead(Uint8 id);
+
 	void restart();
 	void check_restart();
 
@@ -181,6 +184,9 @@ private:
 
 	void resetPlayer(Uint8 id);
 	bool can_spawn_in_pos(int row, int col);
+
+	// remove health and check for death
+	void damage_player(Uint8 shooterId, Uint8 victimId);
 
 	//// mark all (used) player alive
 	//void bringAllToLife();
@@ -420,6 +426,9 @@ private:
 
 	// a distance after which shoot has no effect
 	float _shoot_distace;
+
+	// the damage when shooting at point-blank
+	float _original_dmg = 20;
 
 	// the map that includes the walling, etc
 	Map _map;

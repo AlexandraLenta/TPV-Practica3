@@ -299,6 +299,7 @@ void LittleWolf::resetPlayer(Uint8 id) {
 					2.0f, 			// Speed.
 					0.9f, 			// Acceleration.
 					0.0f, 			// Rotation angle in radians.
+					100,
 					ALIVE 			// Player state
 	};
 
@@ -523,12 +524,12 @@ void LittleWolf::render_players_info() {
 	uint_fast16_t y = 0;
 
 	for (auto i = 0u; i < _max_player; i++) {
-		PlayerState s = _players[i].state;
+		Player& p = _players[i];
 
 		// render player info if it is used
-		if (s != NOT_USED) {
+		if (p.state != NOT_USED) {
 			std::string msg = (i == _curr_player_id ? "*P" : " P")
-				+ std::to_string(i) + (s == DEAD ? " (dead)" : "");
+				+ std::to_string(i) + (p.state == DEAD ? " (dead)" : " - " + std::to_string(p.hp));
 
 			Texture info(sdlutils().renderer(), msg,
 				sdlutils().fonts().at("MFR24"),
@@ -544,7 +545,7 @@ void LittleWolf::render_players_info() {
 }
 
 void LittleWolf::render_restart_message() {
-	Texture restart_msg(sdlutils().renderer(), "The game will restart in " + std::to_string(std::roundf(_resetTime - sdlutils().virtualTimer().currRealTime()) / 1000.0f) + " seconds.", sdlutils().fonts().at("MFR24"), build_sdlcolor(color_rgba(10)));
+	Texture restart_msg(sdlutils().renderer(), "The game will restart in " + std::to_string(static_cast<int>(std::round(_resetTime - sdlutils().virtualTimer().currRealTime()) / 1000.0f)) + " seconds.", sdlutils().fonts().at("MFR24"), build_sdlcolor(color_rgba(10)));
 
 	SDL_FRect dest = build_sdlfrect(sdlutils().width() / 4, sdlutils().height() / 2, restart_msg.width(), restart_msg.height());
 
@@ -655,12 +656,36 @@ int LittleWolf::shoot(Uint8 id) {
 			// if the player we hit is the same one that shot, continue;
 			if (hitPlayerID == id) continue;
 
+			damage_player(id, hitPlayerID);
+
 			// else we return the id of the player we hit
 			return hitPlayerID;
 		}
 	}
 	// return - 1 if we didn't hit anyone
 	return -1;
+}
+
+void LittleWolf::damage_player(Uint8 shooterId, Uint8 victimId) {
+	Player& shooter = _players[shooterId];
+	Player& victim = _players[victimId];
+
+	float distance = mag(sub(shooter.where, victim.where));
+
+	// how far along the line between 0 --------- _shoot_distance we shot from
+	float distPorcentage = distance / _shoot_distace;
+
+	// we don't just multiply the original dmg, we remove from it the percentage because we want more damage when the players are closer to each other
+	float dmg = _original_dmg - _original_dmg * distPorcentage;
+
+	victim.hp -= dmg;
+
+	if (victim.hp <= 0)
+		victim.state = DEAD;
+}
+
+bool LittleWolf::is_dead(Uint8 id) {
+	return _players[id].state == DEAD;
 }
 
 // shoot function

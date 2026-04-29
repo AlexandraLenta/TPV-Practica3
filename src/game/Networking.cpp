@@ -257,7 +257,9 @@ void Networking::handle_shoot(const ShootMsg& m) {
 		int victimID = Game::Instance()->get_wolves().shoot(m.clientId);
 
 		if (victimID != -1) {
-			send_dead(victimID, m.clientId, SDL_GetTicks());
+			Game::Instance()->get_wolves().play_shootSFX(m.clientId, LittleWolf::SFX::PAIN); // send damage sound to each player
+			if (Game::Instance()->get_wolves().is_dead(victimID)) // if the victim is dead we send the death message
+				send_dead(victimID, m.clientId, SDL_GetTicks());
 		}
 	}
 }
