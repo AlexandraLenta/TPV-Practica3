@@ -214,9 +214,11 @@ void Networking::send_damaged_info(Uint8 id, int hp) {
 
 void Networking::send_score_info(Uint8 id, int score) {
 	PlayerScoreInfoMsg m;
-	m.type = _DAMAGE;
+	m.type = _SCORE;
 	m.clientId = id;
 	m.score = score;
+
+	std::cout << "Receiver: " << (int)_client_Id << " about id: " << (int)m.clientId << '\n';
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -311,6 +313,7 @@ void Networking::handle_restart_trigger() {
 }
 
 void Networking::handle_damaged(const PlayerDmgInfoMsg& m) {
+	std::cout << "Player with id: " << (int)_client_Id << " modifying hp of player with id: " << (int)m.clientId << '\n';
 	Game::Instance()->get_wolves().update_player_hp(m.clientId, m.hp);
 }
 

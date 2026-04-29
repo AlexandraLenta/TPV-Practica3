@@ -863,8 +863,6 @@ void LittleWolf::update_player_hp(Uint8 id, int hp) {
 	Player& p = _players[id];
 
 	p.hp = hp;
-
-	std::cout << "ID: " << id << "; new hp: " << hp << '\n';
 }
 
 void LittleWolf::update_player_score(Uint8 id, int score) {
