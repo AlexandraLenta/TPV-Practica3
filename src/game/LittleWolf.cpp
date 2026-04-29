@@ -530,7 +530,7 @@ void LittleWolf::render_players_info() {
 		// render player info if it is used
 		if (p.state != NOT_USED) {
 			std::string msg = (i == _curr_player_id ? "*P" : " P")
-				+ std::to_string(i) + (p.state == DEAD ? " (dead)" : " - " + std::to_string(p.hp));
+				+ std::to_string(i) + (p.state == DEAD ? " (dead)" : " - " + std::to_string(p.hp) + " | " + std::to_string(p.score) + " pts");
 
 			Texture info(sdlutils().renderer(), msg,
 				sdlutils().fonts().at("MFR24"),
