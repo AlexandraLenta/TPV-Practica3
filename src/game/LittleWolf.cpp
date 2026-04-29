@@ -52,23 +52,12 @@ void LittleWolf::update() {
 		if (ihdlr.isKeyDown(SDL_SCANCODE_T)) { // toggle help
 			_show_help = !_show_help;
 		}
-		else if (ihdlr.isKeyDown(SDL_SCANCODE_N)) { // N switches to the next player view
-			switchToNextPlayer();
-		}
-		else if (ihdlr.isKeyDown(SDL_SCANCODE_R)) { // R brings dead to life
-			bringAllToLife();
-		}
 		else if (ihdlr.isKeyDown(SDL_SCANCODE_M)) { // M mutes/unmutes sound
 			muteSound();
 		}
-
 	}
 
 	Player& p = _players[_curr_player_id];
-
-	// dead players don't move/spin/shoot
-	if (p.state != ALIVE)
-		return;
 
 	// save position and rotation before movement
 	Point oldPos = p.where;
