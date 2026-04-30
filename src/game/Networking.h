@@ -23,8 +23,8 @@ public:
 		return _client_Id == _master_Id;
 	}
 
-	void send_state(const Vector2D& pos, float rot, const Vector2D& oldPos, float oldRot);
-	void send_my_info(const Vector2D& pos, float rot, int hp, int score,
+	void send_state(const Vector2D& pos, float rot);
+	void send_my_info(const Vector2D& pos, float rot, Vector2D fovA, Vector2D fovB, int hp, int score,
 		Uint8 state, std::string name);
 	void send_shoot(Uint8 id);
 	void send_damaged_info(Uint8 id, int hp);

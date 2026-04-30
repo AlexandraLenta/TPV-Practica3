@@ -177,20 +177,17 @@ void Networking::update() {
 	}
 }
 
-void Networking::send_state(const Vector2D& pos, float rot, const Vector2D& oldPos, float oldRot) {
+void Networking::send_state(const Vector2D& pos, float rot) {
 	PlayerStateMsg m;
 	m.type = _PLAYER_STATE;
 	m.clientId = _client_Id;
 	m.x = pos.getX();
 	m.y = pos.getY();
 	m.rot = rot;
-	m.oldX = oldPos.getX();
-	m.oldY = oldPos.getY();
-	m.oldRot = oldRot;
 	SDLNetUtils::serialized_send(m, sock);
 }
 
-void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
+void Networking::send_my_info(const Vector2D& pos, float rot, Vector2D fovA, Vector2D fovB, int hp, int score,
 	Uint8 state, std::string name) {
 	PlayerInfoMsg m;
 	m.type = _PLAYER_INFO;
@@ -201,6 +198,10 @@ void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
 	m.hp = hp;
 	m.score = score;
 	m.state = state;
+	m.fovAx = fovA.getX();
+	m.fovAy = fovA.getY();
+	m.fovBx = fovB.getX();
+	m.fovBy = fovB.getY();
 	Game::Instance()->string_to_chars(name, m.name);
 
 	SDLNetUtils::serialized_send(m, sock);
@@ -272,7 +273,7 @@ void Networking::handle_player_info(PlayerInfoMsg& m) {
 		std::string name;
 		Game::Instance()->chars_to_string(name, m.name);
 		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
-			m.y, m.rot, m.hp, m.score, m.state, name);
+			m.y, m.rot, {{m.fovAx, m.fovAy}, {m.fovBx, m.fovBy}}, m.hp, m.score, m.state, name);
 	}
 }
 

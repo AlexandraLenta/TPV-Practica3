@@ -3,6 +3,7 @@
 #pragma once
 #include <SDL_stdinc.h>
 #include "SDLNetUtils.h"
+#include "LittleWolf.h"
 
 enum MsgId : Uint8 {
 	_CONN_REQUEST,
@@ -18,8 +19,7 @@ enum MsgId : Uint8 {
 	_SHOOT,
 	_DEAD,
 	_RESTART,
-	_RESTART_TRIGGER,
-	_NAME_SET
+	_RESTART_TRIGGER
 };
 
 struct Msg {
@@ -46,10 +46,6 @@ struct PlayerStateMsg : MsgWithClientId {
 	float y;
 	float rot;
 
-	float oldX;
-	float oldY;
-	float oldRot;
-
 	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot)
 
 };
@@ -59,12 +55,16 @@ struct PlayerInfoMsg : MsgWithClientId {
 	float x;
 	float y;
 	float rot;
+	float fovAx;
+	float fovBx;
+	float fovAy;
+	float fovBy;
 	int hp;
 	int score;
 	Uint8 state;
 	char name[11];
 
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, hp, score, state, name)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, fovAx, fovAy, fovBx, fovBy, hp, score, state, name)
 
 };
 

@@ -59,10 +59,6 @@ void LittleWolf::update() {
 
 	Player& p = _players[_curr_player_id];
 
-	// save position and rotation before movement
-	Point oldPos = p.where;
-	float oldRot = p.theta;
-
 	// check if we can do actions
 	if (_canMove && p.state == ALIVE) {
 		spin(p);  // handle spinning
@@ -81,7 +77,7 @@ void LittleWolf::update() {
 
 	// send player's state (new position and old position)
 	Game::Instance()->get_networking().send_state({ p.where.x, p.where.y },
-		p.theta, { oldPos.x, oldPos.y }, oldRot);
+		p.theta);
 }
 
 void LittleWolf::load(std::string filename) {
@@ -701,7 +697,7 @@ void LittleWolf::damage_player(Uint8 shooterId, Uint8 victimId) {
 	shooter.score += 1;
 	
 	Game::Instance()->get_networking().send_damaged_info(victimId, victim.hp);
-	Game::Instance()->get_networking().send_score_info(shooter.id, shooter.score);
+	Game::Instance()->get_networking().send_score_info(shooterId, shooter.score);
 }
 
 bool LittleWolf::is_dead(Uint8 id) {
@@ -771,7 +767,7 @@ void LittleWolf::send_my_info() {
 	Game::Instance()->chars_to_string(name, p.name);
 
 	Game::Instance()->get_networking().send_my_info(Vector2D(p.where.x, p.where.y),
-		p.theta, p.hp, p.score, p.state, name);
+		p.theta, { p.fov.a.x, p.fov.a.y }, { p.fov.b.x, p.fov.b.y }, p.hp, p.score, p.state, name);
 }
 
 void LittleWolf::update_player_state(Uint8 id, float x, float y, float rot) {
@@ -808,7 +804,7 @@ void LittleWolf::killPlayer(Uint8 id) {
 	_players[id].state = PlayerState::DEAD;
 }
 
-void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int hp, int score, Uint8 state, std::string name) {
+void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, Line fov, int hp, int score, Uint8 state, std::string name) {
 	Player& p = _players[id];
 
 	int old_x = (int)p.where.x; // cogemos la posicion del jugador con el id dado antes de darle el nuevo x e y
@@ -821,6 +817,7 @@ void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int h
 	p.state = static_cast<PlayerState>(state);
 	p.hp = hp;
 	p.score = score;
+	p.fov = fov;
 
 	Game::Instance()->string_to_chars(name, p.name);
 

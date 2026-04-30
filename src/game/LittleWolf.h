@@ -159,7 +159,7 @@ public:
 	void removePlayer(Uint8 id);	
 	void killPlayer(Uint8 id);
 	void update_player_state(Uint8 id, float x, float y, float rot);
-	void update_player_info(Uint8 id, float x, float y, float rot, int hp, int score, Uint8 state, std::string name);
+	void update_player_info(Uint8 id, float x, float y, float rot, Line fov, int hp, int score, Uint8 state, std::string name);
 	void update_player_hp(Uint8 id, int hp);
 	void update_player_score(Uint8 id, int score);
 	void update_player_name(Uint8 id, std::string name);
