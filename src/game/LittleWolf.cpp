@@ -72,7 +72,7 @@ void LittleWolf::update() {
 	// can't move means we are waiting for the game to restart
 	else if (!_canMove) {
 		auto& vt = sdlutils().virtualTimer();
-		if (vt.currRealTime() > _resetTime) { 
+		if (vt.currRealTime() > _resetTime) {
 			if (Game::Instance()->get_networking().is_master()) { // if we are the master, we restart the game
 				Game::Instance()->get_networking().send_restart();
 			}
@@ -635,6 +635,7 @@ void LittleWolf::spin(Player& p) {
 }
 
 int LittleWolf::shoot(Uint8 id) {
+	std::cout << "Master inside shoot.\n";
 	Player& p = _players[id];
 
 	// we shoot in several directions, because with projection what you see is not exact
@@ -645,7 +646,10 @@ int LittleWolf::shoot(Uint8 id) {
 		Point direction = lerp(camera, 0.5f);
 		direction.x = direction.x / mag(direction);
 		direction.y = direction.y / mag(direction);
+
+		std::cout << "Master right before cast.\n";
 		const Hit hit = cast(p.where, direction, _map.walling, false, true);
+		std::cout << "Master right after cast.\n";
 
 #ifdef _DEBUG
 		printf(
@@ -657,6 +661,8 @@ int LittleWolf::shoot(Uint8 id) {
 		// than shoot_distace, we mark the player as dead
 		if (hit.tile > 9 && mag(sub(p.where, hit.where)) < _shoot_distace) {
 			Uint8 hitPlayerID = tile_to_player(hit.tile);
+
+			std::cout << "Shooter: " << (int)id << " hit: " << (int)hitPlayerID << '\n';
 
 			// if the player we hit is the same one that shot, continue;
 			if (hitPlayerID == id) continue;
@@ -672,6 +678,8 @@ int LittleWolf::shoot(Uint8 id) {
 }
 
 void LittleWolf::damage_player(Uint8 shooterId, Uint8 victimId) {
+
+	std::cout << "Player with id: " << (int)shooterId << " shot " << (int)victimId << '\n';
 	Player& shooter = _players[shooterId];
 	Player& victim = _players[victimId];
 
@@ -704,6 +712,7 @@ bool LittleWolf::is_dead(Uint8 id) {
 void LittleWolf::shootNetwork(Uint8 id) {
 	auto& ihdlr = ih();
 	if (ihdlr.keyDownEvent() && ihdlr.isKeyDown(SDL_SCANCODE_SPACE)) {
+		std::cout << "Player with id: " << (int)id << " has shot!\n";
 		Game::Instance()->get_networking().send_shoot(id);
 	}
 }

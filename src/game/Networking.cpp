@@ -220,7 +220,6 @@ void Networking::send_score_info(Uint8 id, int score) {
 	m.clientId = id;
 	m.score = score;
 
-	std::cout << "Receiver: " << (int)_client_Id << " about id: " << (int)m.clientId << '\n';
 	SDLNetUtils::serialized_send(m, sock);
 }
 
@@ -266,14 +265,6 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 		Game::Instance()->get_wolves().update_player_state(m.clientId, m.x,
 			m.y, m.rot);
 	}
-
-	//if (_client_Id == _master_Id) {
-	//	auto* playerList = Game::Instance()->get_wolves().getPlayers();
-	//	int maxPlayers = Game::Instance()->get_wolves().getMaxPlayers();
-	//	for (int i = 0; i < maxPlayers; i++) {
-
-	//	}
-	//}
 }
 
 void Networking::handle_player_info(PlayerInfoMsg& m) {
@@ -289,6 +280,8 @@ void Networking::handle_shoot(const ShootMsg& m) {
 	Game::Instance()->get_wolves().play_shootSFX(m.clientId, LittleWolf::SFX::GUNSHOT); // send gunshot sound to each player
 
 	if (_client_Id == _master_Id) {
+
+		std::cout << "Master with id: " << (int)_master_Id << " checking shooting...\n";
 		int victimID = Game::Instance()->get_wolves().shoot(m.clientId);
 
 		if (victimID != -1) {
