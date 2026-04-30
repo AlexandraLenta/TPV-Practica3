@@ -102,6 +102,7 @@ void Networking::update() {
 	DeadMsg m6;
 	PlayerDmgInfoMsg m7;
 	PlayerScoreInfoMsg m8;
+	NameMsg m9;
 
 	while (true) {
 		SDLNetUtils::buff_t buf = SDLNetUtils::receive(sock);
@@ -169,6 +170,10 @@ void Networking::update() {
 		case _SCORE:
 			m8.deserialize(buf.data);
 			handle_score(m8);
+			break;
+		case _NAME_SET:
+			m9.deserialize(buf.data);
+			handle_name_set(m9);
 			break;
 
 		default:
@@ -251,6 +256,14 @@ void Networking::send_restart_trigger() {
 	SDLNetUtils::serialized_send(m, sock);
 }
 
+void Networking::send_name_set(Uint8 id, const std::string name) {
+	NameMsg m;
+	m.type = _NAME_SET;
+	m.clientId = id; 
+	Game::Instance()->string_to_chars(name, m.name);
+	SDLNetUtils::serialized_send(m, sock);
+}
+
 void Networking::handle_new_client(Uint8 id) {
 	if (id != _client_Id)
 		Game::Instance()->get_wolves().send_my_info();
@@ -277,7 +290,6 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 
 void Networking::handle_player_info(const PlayerInfoMsg& m) {
 	if (m.clientId != _client_Id) {
-		std::cout << "Handle: " << m.hp << ' ' << m.score << '\n';
 		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
 			m.y, m.rot, m.hp, m.score, m.state);
 	}
@@ -321,4 +333,10 @@ void Networking::handle_damaged(const PlayerDmgInfoMsg& m) {
 
 void Networking::handle_score(const PlayerScoreInfoMsg& m) {
 	Game::Instance()->get_wolves().update_player_score(m.clientId, m.score);
+}
+
+void Networking::handle_name_set(NameMsg& m) {
+	std::string name;
+	Game::Instance()->chars_to_string(name, m.name);
+	Game::Instance()->get_wolves().update_player_name(m.clientId, name);
 }

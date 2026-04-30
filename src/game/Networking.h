@@ -33,6 +33,7 @@ public:
 	void send_dead(Uint8 id, Uint8 shooter, Uint32 timestamp);
 	void send_restart();
 	void send_restart_trigger();
+	void send_name_set(Uint8 id, const std::string name);
 
 private:
 
@@ -46,6 +47,7 @@ private:
 	void handle_restart_trigger();
 	void handle_damaged(const PlayerDmgInfoMsg& m);
 	void handle_score(const PlayerScoreInfoMsg& m);
+	void handle_name_set(NameMsg& m);
 
 	NET_StreamSocket* sock;
 	Uint8 _client_Id;

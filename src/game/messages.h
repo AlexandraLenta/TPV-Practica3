@@ -18,7 +18,8 @@ enum MsgId : Uint8 {
 	_SHOOT,
 	_DEAD,
 	_RESTART,
-	_RESTART_TRIGGER
+	_RESTART_TRIGGER,
+	_NAME_SET
 };
 
 struct Msg {
@@ -96,4 +97,10 @@ struct ShootMsg : MsgWithClientId {
 	float rot;
 	Uint32 timestamp;
 	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, vx, vy, w, h, rot, timestamp)
+};
+
+struct NameMsg : MsgWithClientId {
+	char name[11];
+
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), name)
 };

@@ -259,6 +259,11 @@ bool LittleWolf::addPlayer(Uint8 id, std::string name) {
 
 	send_my_info();
 
+	char cName[11];
+	Game::Instance()->string_to_chars(name, cName);
+
+	Game::Instance()->get_networking().send_name_set(id, cName);
+
 	return true;
 }
 
@@ -290,8 +295,6 @@ void LittleWolf::resetPlayer(Uint8 id, std::string name) {
 	if (row >= _map.walling_height)
 		return;
 
-	char username[11];
-	Game::Instance()->string_to_chars(name, username);
 
 	// initialize the player
 	Player p = { //
@@ -304,9 +307,11 @@ void LittleWolf::resetPlayer(Uint8 id, std::string name) {
 				0.0f, 			// Rotation angle in radians.
 				100,			// health points
 				0,				// score points
-				*username, // name
+				{}, // name
 				ALIVE 			// Player state
 	};
+
+	Game::Instance()->string_to_chars(name, p.name);
 
 	// note that player <id> is stored in the map as player_to_tile(id) -- which is id+10
 	_map.walling[(int)p.where.y][(int)p.where.x] = player_to_tile(id);
@@ -875,4 +880,11 @@ void LittleWolf::update_player_score(Uint8 id, int score) {
 	Player& p = _players[id];
 
 	p.score = score;
+}
+
+
+void LittleWolf::update_player_name(Uint8 id, std::string name) {
+	Player& p = _players[id];
+
+	Game::Instance()->string_to_chars(name, p.name);
 }

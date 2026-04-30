@@ -23,7 +23,7 @@ public:
 		return *_little_wolf;
 	}
 
-	void string_to_chars(std::string& str, char c_str[11]) {
+	void string_to_chars(const std::string& str, char c_str[11]) {
 		auto i = 0u;
 		for (; i < str.size() && i < 10; i++) c_str[i] = str[i];
 		c_str[i] = 0;

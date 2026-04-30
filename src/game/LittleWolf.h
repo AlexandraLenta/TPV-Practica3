@@ -162,6 +162,7 @@ public:
 	void update_player_info(Uint8 id, float x, float y, float rot, int hp, int score, Uint8 state);
 	void update_player_hp(Uint8 id, int hp);
 	void update_player_score(Uint8 id, int score);
+	void update_player_name(Uint8 id, std::string name);
 
 	void play_shootSFX(Uint8 id, SFX sound);
 	int shoot(Uint8 id);
