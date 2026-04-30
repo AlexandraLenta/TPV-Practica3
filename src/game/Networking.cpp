@@ -102,7 +102,6 @@ void Networking::update() {
 	DeadMsg m6;
 	PlayerDmgInfoMsg m7;
 	PlayerScoreInfoMsg m8;
-	NameMsg m9;
 
 	while (true) {
 		SDLNetUtils::buff_t buf = SDLNetUtils::receive(sock);
@@ -171,10 +170,6 @@ void Networking::update() {
 			m8.deserialize(buf.data);
 			handle_score(m8);
 			break;
-		case _NAME_SET:
-			m9.deserialize(buf.data);
-			handle_name_set(m9);
-			break;
 
 		default:
 			break;
@@ -196,7 +191,7 @@ void Networking::send_state(const Vector2D& pos, float rot, const Vector2D& oldP
 }
 
 void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
-	Uint8 state) {
+	Uint8 state, std::string name) {
 	PlayerInfoMsg m;
 	m.type = _PLAYER_INFO;
 	m.clientId = _client_Id;
@@ -206,6 +201,7 @@ void Networking::send_my_info(const Vector2D& pos, float rot, int hp, int score,
 	m.hp = hp;
 	m.score = score;
 	m.state = state;
+	Game::Instance()->string_to_chars(name, m.name);
 
 	SDLNetUtils::serialized_send(m, sock);
 }
@@ -256,14 +252,6 @@ void Networking::send_restart_trigger() {
 	SDLNetUtils::serialized_send(m, sock);
 }
 
-void Networking::send_name_set(Uint8 id, const std::string name) {
-	NameMsg m;
-	m.type = _NAME_SET;
-	m.clientId = id; 
-	Game::Instance()->string_to_chars(name, m.name);
-	SDLNetUtils::serialized_send(m, sock);
-}
-
 void Networking::handle_new_client(Uint8 id) {
 	if (id != _client_Id)
 		Game::Instance()->get_wolves().send_my_info();
@@ -279,19 +267,21 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 			m.y, m.rot);
 	}
 
-	if (_client_Id == _master_Id) {
-		auto* playerList = Game::Instance()->get_wolves().getPlayers();
-		int maxPlayers = Game::Instance()->get_wolves().getMaxPlayers();
-		for (int i = 0; i < maxPlayers; i++) {
+	//if (_client_Id == _master_Id) {
+	//	auto* playerList = Game::Instance()->get_wolves().getPlayers();
+	//	int maxPlayers = Game::Instance()->get_wolves().getMaxPlayers();
+	//	for (int i = 0; i < maxPlayers; i++) {
 
-		}
-	}
+	//	}
+	//}
 }
 
-void Networking::handle_player_info(const PlayerInfoMsg& m) {
+void Networking::handle_player_info(PlayerInfoMsg& m) {
 	if (m.clientId != _client_Id) {
+		std::string name;
+		Game::Instance()->chars_to_string(name, m.name);
 		Game::Instance()->get_wolves().update_player_info(m.clientId, m.x,
-			m.y, m.rot, m.hp, m.score, m.state);
+			m.y, m.rot, m.hp, m.score, m.state, name);
 	}
 }
 
@@ -333,10 +323,4 @@ void Networking::handle_damaged(const PlayerDmgInfoMsg& m) {
 
 void Networking::handle_score(const PlayerScoreInfoMsg& m) {
 	Game::Instance()->get_wolves().update_player_score(m.clientId, m.score);
-}
-
-void Networking::handle_name_set(NameMsg& m) {
-	std::string name;
-	Game::Instance()->chars_to_string(name, m.name);
-	Game::Instance()->get_wolves().update_player_name(m.clientId, name);
 }

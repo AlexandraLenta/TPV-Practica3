@@ -259,11 +259,6 @@ bool LittleWolf::addPlayer(Uint8 id, std::string name) {
 
 	send_my_info();
 
-	char cName[11];
-	Game::Instance()->string_to_chars(name, cName);
-
-	Game::Instance()->get_networking().send_name_set(id, cName);
-
 	return true;
 }
 
@@ -763,8 +758,11 @@ void LittleWolf::muteSound() {
 void LittleWolf::send_my_info() {
 	Player& p = _players[_curr_player_id];
 
+	std::string name;
+	Game::Instance()->chars_to_string(name, p.name);
+
 	Game::Instance()->get_networking().send_my_info(Vector2D(p.where.x, p.where.y),
-		p.theta, p.hp, p.score, p.state);
+		p.theta, p.hp, p.score, p.state, name);
 }
 
 void LittleWolf::update_player_state(Uint8 id, float x, float y, float rot) {
@@ -801,7 +799,7 @@ void LittleWolf::killPlayer(Uint8 id) {
 	_players[id].state = PlayerState::DEAD;
 }
 
-void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int hp, int score, Uint8 state) {
+void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int hp, int score, Uint8 state, std::string name) {
 	Player& p = _players[id];
 
 	int old_x = (int)p.where.x; // cogemos la posicion del jugador con el id dado antes de darle el nuevo x e y
@@ -814,6 +812,8 @@ void LittleWolf::update_player_info(Uint8 id, float x, float y,	float rot, int h
 	p.state = static_cast<PlayerState>(state);
 	p.hp = hp;
 	p.score = score;
+
+	Game::Instance()->string_to_chars(name, p.name);
 
 	std::cout << p.hp << " " << p.score << '\n';
 

@@ -62,8 +62,9 @@ struct PlayerInfoMsg : MsgWithClientId {
 	int hp;
 	int score;
 	Uint8 state;
+	char name[11];
 
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, hp, score, state)
+	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, rot, hp, score, state, name)
 
 };
 
@@ -97,10 +98,4 @@ struct ShootMsg : MsgWithClientId {
 	float rot;
 	Uint32 timestamp;
 	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), x, y, vx, vy, w, h, rot, timestamp)
-};
-
-struct NameMsg : MsgWithClientId {
-	char name[11];
-
-	_IMPL_SERIALIZATION_(*static_cast<MsgWithClientId*>(this), name)
 };
