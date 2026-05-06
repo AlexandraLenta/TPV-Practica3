@@ -266,6 +266,8 @@ void Networking::handle_player_state(const PlayerStateMsg& m) {
 		Game::Instance()->get_wolves().update_player_state(m.clientId, m.x,
 			m.y, m.rot);
 	}
+
+	// MASTER SHOULD CHECK CONFLICT
 }
 
 void Networking::handle_player_info(PlayerInfoMsg& m) {
